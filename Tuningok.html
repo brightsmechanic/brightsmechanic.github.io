@@ -145,13 +145,36 @@
             font-size: 18px;
         }
 
+        back-button {
+            background-color: black;
+            color: white;
+            font-size: 18px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        /* Mobilbarát kialakítás */
+        @media (max-width: 600px) {
+            .bottom-border {
+                width: 95%;
+                padding: 15px;
+            }
+
+            .back-button {
+                font-size: 16px;
+                padding: 8px 15px;
+            }
+}
     </style>
 </head>
 <body>
     <header>
         <h1>Bright's Mechanic Tuningok</h1>
     </header>
-
+<button class="back-button" onclick="window.location.href='index.html'">Vissza</button>
     <div class="bottom-border">
         <h2>Tuningok</h2>
 
