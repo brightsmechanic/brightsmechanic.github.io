@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heti Munkaidő</title>
+    
+    <style>
+        
+        @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@700&display=swap');
+        
+        body {
+            background-color: #d0f0c0; /* Halvány zöld háttér */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .header {
+            background-color: white; /* Világos fehér keret */
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 2vh;
+            margin-top: 2vh;
+            font-family: 'Raleway', sans-serif;
+            font-size: 30px;
+            font-weight: bold;
+            color: #4a7c59; /* Sötétzöld szöveg */
+            text-align: center;
+            width: auto;
+            min-width: 50%;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        .frame {
+            background-color: #4a7c59; /* Sötétebb zöld keret */
+            border-radius: 15px; /* Lekerekített élek */
+            padding: 20px;
+            width: calc(100vw - 4cm);
+            height: calc(100vh - 2cm);
+            display: flex;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            position: relative;
+            justify-content: space-between;
+            align-items: center;
+            flex-direction: column;
+        }
+        .side-panel {
+            background-color: #fff8b5; /* Halvány sárga keret */
+            border-radius: 15px;
+            width: 90%;
+            height: auto;
+            margin-left: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            font-family: 'Raleway', sans-serif;
+            font-size: 20px;
+            font-weight: bold;
+            color: black;
+            text-align: center;
+        }
+
+        .input-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .input-container label {
+            font-size: 18px;
+        }
+        .input-container input[type="time"] {
+            -webkit-appearance: none; /* Letiltja a kézi írást */
+            -moz-appearance: none;
+            appearance: none;
+            padding: 5px;
+            font-size: 16px;
+            text-align: right; /* A számok igazítása a jobb oldalra */
+            pointer-events: all; /* Csak az időválasztó használható */
+            cursor: pointer;
+        }
+        .input-container input[type="time"]::-webkit-calendar-picker-indicator {
+            cursor: pointer; /* Csak a naptár ikonnal választható az idő */
+        }
+        .reset-icon {
+            font-size: 20px;
+            background-color: #4a7c59;
+            color: white;
+            padding: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .reset-icon:hover {
+            background-color: #333;
+        }
+        .status-icon {
+            font-size: 24px;
+            margin-left: 10px;
+        }
+        .counter {
+            font-size: 50px; /* Nagyobb betűméret */
+            font-weight: bold;
+            color: #d0f0c0; /* Ugyanaz a világos zöld szín, mint a háttér */
+            text-align: center;
+            flex-grow: 1;
+        }
+        .week-days {
+            display: flex;
+            flex-direction: column; /* Függőleges elrendezés */
+            justify-content: flex-start;
+            margin-top: 15px;
+        }
+        .day {
+            font-size: 20px;
+            margin-bottom: 10px; /* Néhány pixel távolság a napok között */
+        }
+        .current-day {
+            color: green;
+        }
+        .reset-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 8px 15px;
+            background-color: black;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .reset-button:hover {
+            background-color: #333;
+        }
+
+        .progress-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .progress-bar .box {
+            width: 40px;
+            height: 40px;
+            background-color: #e0e0e0; /* Szürke háttér */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            border-radius: 8px;
+        }
+
+        .progress-bar .box.filled {
+            background-color: #4a7c59; /* Zöld háttér, ha kitöltve */
+            color: white;
+        }
+
+        /* A kép stílusai */
+        .image-container {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 7cm;
+            height: 7cm;
+        }
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px; /* Kép lekerekített sarkai */
+        }
+  
+  </style>
+
+    <script>
+        // Betölteni a korábban elmentett munkaidőt
+        window.onload = function() {
+            let storedTime = localStorage.getItem('totalWorkedMinutes');
+            if (storedTime) {
+                let hours = Math.floor(storedTime / 60);
+                let minutes = storedTime % 60;
+                document.getElementById('counter-display').innerText = `Szolgálatban töltött idő a héten: ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+            }
+
+            // Aktuális nap meghatározása és a megfelelő emoji hozzáadása
+            let days = ["Hétfő", "Kedd", "Szerda", "Csütörtök", "Péntek", "Szombat", "Vasárnap"];
+            let currentDay = new Date().getDay(); // 0 - Vasárnap, 1 - Hétfő, ..., 6 - Szombat
+            let dayElements = document.querySelectorAll('.day');
+            
+            for (let i = 0; i < 7; i++) {
+                if (i === currentDay - 1) {
+                    dayElements[i].innerHTML = days[i] + " ✅"; // Zöld pipa az aktuális napnál
+                    dayElements[i].classList.add('current-day');
+                } else {
+                    dayElements[i].innerHTML = days[i]; // Csak a napok neve, ha nem aktuális
+                }
+            }
+
+            updateProgress(); // Frissítjük a fejléc alatti kockákat
+        };
+
+        function updateStatus() {
+            let startTime = document.getElementById('start-time').value;
+            let endTime = document.getElementById('end-time').value;
+            let statusIcon = document.getElementById('status-icon');
+            let counterDisplay = document.getElementById('counter-display');
+
+            if (startTime && endTime) {
+                let start = startTime.split(':');
+                let end = endTime.split(':');
+                
+                let startMinutes = parseInt(start[0]) * 60 + parseInt(start[1]);  // Kezdési idő percben
+                let endMinutes = parseInt(end[0]) * 60 + parseInt(end[1]);  // Befejezési idő percben
+                
+                // Ha az endTime előbb van, mint a startTime, akkor a következő napra kell számolni
+                if (endMinutes < startMinutes) {
+                    endMinutes += 24 * 60;  // Hozzáadunk 24 órát (1440 percet)
+                }
+
+                let workedMinutes = endMinutes - startMinutes;  // Munkaidő percben
+
+                if (workedMinutes > 0) {
+                    // Elmentjük a munkaidőt
+                    let storedTime = localStorage.getItem('totalWorkedMinutes') || 0;
+                    let newTotal = parseInt(storedTime) + workedMinutes;
+                    localStorage.setItem('totalWorkedMinutes', newTotal);
+
+                    let hours = Math.floor(newTotal / 60);  // Órák számítása
+                    let minutes = newTotal % 60;  // Percek számítása
+                    counterDisplay.innerText = `Szolgálatban töltött idő a héten: ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+                    updateProgress();  // Frissítjük a kockákat
+                }
+                statusIcon.innerText = '❌';
+            } else if (startTime) {
+                statusIcon.innerText = '✅';
+            } else {
+                statusIcon.innerText = '';
+            }
+        }
+
+        // Frissíti a kockák állapotát
+        function updateProgress() {
+            let storedTime = localStorage.getItem('totalWorkedMinutes') || 0;
+            let halfHourCount = Math.floor(storedTime / 30); // Félórák száma
+
+            // Minden kockát üresre állítunk, majd kitöltjük a teljesített idő alapján
+            let boxes = document.querySelectorAll('.progress-bar .box');
+            boxes.forEach((box, index) => {
+                if (index < halfHourCount) {
+                    box.classList.add('filled');
+                    box.innerHTML = '✅';  // Zöld pipa
+                } else {
+                    box.classList.remove('filled');
+                    box.innerHTML = '';  // Üres
+                }
+            });
+        }
+
+        // Heti idő nullázása
+        function resetTime() {
+            localStorage.setItem('totalWorkedMinutes', '0');
+            document.getElementById('counter-display').innerText = 'Szolgálatban töltött idő a héten: 00:00';
+            updateProgress();  // Frissítjük a kockákat
+        }
+
+        // Törlés funkció
+        function clearInput(inputId) {
+            document.getElementById(inputId).value = ''; // Törli az értéket
+            updateStatus(); // Frissíti az állapotot
+        }
+    </script>
+</head>
+
+
+<body>
+    <div class="header">Bright's Mechanic Munkaidő Számláló</div>
+    <div class="frame">
+        <div class="side-panel">
+            Munkaidő Számláló
+            <div class="input-container">
+                <label>Munkaidő kezdete:</label>
+                <input type="time" id="start-time" onchange="updateStatus()">
+                <span class="reset-icon" onclick="clearInput('start-time')">0</span> <!-- Törlés ikon -->
+                <label>Munkaidő vége:</label>
+                <input type="time" id="end-time" onchange="updateStatus()">
+                <span class="reset-icon" onclick="clearInput('end-time')">0</span> <!-- Törlés ikon -->
+                <span id="status-icon" class="status-icon"></span>
+            </div>
+
+            <!-- Heti napok kijelzése -->
+            <div class="week-days">
+                <div class="day"></div>
+                <div class="day"></div>
+                <div class="day"></div>
+                <div class="day"></div>
+                <div class="day"></div>
+                <div class="day"></div>
+                <div class="day"></div>
+            </div>
+        </div>
+        
+
+        <div id="counter-display" class="counter">Szolgálatban töltött idő a héten: 00:00</div>
+        
+        <!-- Heti idő nullázása gomb -->
+        <button class="reset-button" onclick="resetTime()">Heti idő nullázása</button>
+
+        <!-- A kép a jobb alsó sarokban -->
+        <div class="image-container">
+            <img src="B.png" alt="Kép">
+        </div>
+        <table class="rounded-table">
+            <tbody>
+                <tr>
+                    <td><span class="white-background">Próbaidős szerelő</span></td>
+                    <td>11 óra</td>
+                </tr>
+                <tr>
+                    <td><span class="grey-background">Autószerelő</span></td>
+                    <td>10 óra</td>
+                </tr>
+                <tr>
+                    <td><span class="red-background">Tuningszakértő</span></td>
+                    <td>9 óra</td>
+                </tr>
+                <tr>
+                    <td><span class="orange-background">Technikus</span></td>
+                    <td>8 óra</td>
+                </tr>
+                <tr>
+                    <td><span class="yellow-background">Veteránszerelő</span></td>
+                    <td>7 óra</td>
+                </tr>
+                <tr>
+                    <td><span class="lightgreen-background">Mesterszerelő</span></td>
+                    <td>6 óra</td>
+                </tr>
+                <tr>
+                    <td><span class="lightyellow-background">Műszakvezető</span></td>
+                    <td>5 óra</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <style>
+            .rounded-table {
+                width: 35%; /* Csökkentett szélesség (100% - 65%) */
+                border-collapse: separate;
+                border-spacing: 0;
+                border: 4px solid black; /* 4 px vastag keret */
+                border-radius: 10px; /* Lekerekített sarkok */
+                overflow: hidden; /* Biztosítja, hogy a keret ne legyen éles */
+                background-color: transparent;
+                text-align: left; /* Balra igazítjuk a táblázatot */
+                position: absolute; /* Az elhelyezés a képernyő bal oldalán */
+                left: 5cm; /* 5 centivel jobbra kerül */
+                top: 3cm; /* 3 centivel lejjebb kerül */
+            }
+        
+            .rounded-table td {
+                border: 1px solid black;
+                width: 50%;
+                height: 40px;
+                text-align: center;
+                font-size: 18px; /* Nagyobb betűméret */
+                font-weight: bold; /* Vastag betűk */
+                padding: 10px; /* Több hely a szöveg körül */
+            }
+        
+            /* A szövegek mögötti háttérszínek */
+            .white-background {
+                background-color: white;
+                padding: 0 5px; /* Kisebb belső margó */
+            }
+        
+            .grey-background {
+                background-color: grey;
+                padding: 0 5px;
+            }
+        
+            .red-background {
+                background-color: red;
+                padding: 0 5px;
+            }
+        
+            .orange-background {
+                background-color: orange;
+                padding: 0 5px;
+            }
+        
+            .yellow-background {
+                background-color: yellow;
+                padding: 0 5px;
+            }
+        
+            .lightgreen-background {
+                background-color: rgb(64, 235, 64);
+                padding: 0 5px;
+            }
+        
+            .lightyellow-background {
+                background-color: rgb(247, 247, 107);
+                padding: 0 5px;
+            }
+        
+            /* A táblázat sarkainak lekerekítése */
+            .rounded-table tr:first-child td:first-child {
+                border-top-left-radius: 10px;
+            }
+        
+            .rounded-table tr:first-child td:last-child {
+                border-top-right-radius: 10px;
+            }
+        
+            .rounded-table tr:last-child td:first-child {
+                border-bottom-left-radius: 10px;
+            }
+        
+            .rounded-table tr:last-child td:last-child {
+                border-bottom-right-radius: 10px;
+            }
+        </style>
+        <a href="Tuningok.html" target="_blank">
+            <button class="tuning-button">Tuningok</button>
+        </a>
+        
+        <style>
+            .tuning-button {
+                background-color: rgb(141, 10, 10); /* Piros háttérszín RGB kóddal */
+                color: white; /* Fehér szöveg */
+                font-size: 33px; /* Felére csökkentett betűméret */
+                padding: 22px 45px; /* A gomb belső távolsága, fele akkora */
+                border: 4px solid black; /* Fekete keret */
+                border-radius: 25px; /* Lekerekített sarkok */
+                cursor: pointer; /* Kéz ikont mutat, ha fölé viszik az egeret */
+                position: fixed; /* A gomb pozicionálása fixen */
+                bottom: 3%; /* 3%-ra a képernyő aljától */
+                left: 3%; /* 3%-ra a képernyő bal szélétől */
+                transition: background-color 0.3s; /* Finom átmenet a háttérszín változására */
+            }
+        
+            .tuning-button:hover {
+                background-color: rgb(120, 8, 8); /* Sötétebb piros szín, ha fölé viszik az egeret */
+            }
+        </style>
+        
+</body>
+</html>
