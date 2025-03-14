@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heti Munkaidő</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .toggle-button {
+            display: none;
+            background-color: black;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+
+        .table-container {
+            display: block;
+            width: 19%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: transparent;
+            text-align: left;
+
+        }
+
+        .table-container td {
+            border: 1px solid black;
+            width: 50%;
+            height: 40px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 10px;
+        }
+
+        .white-background { background-color: white; padding: 0 5px; }
+        .grey-background { background-color: grey; padding: 0 5px; }
+        .red-background { background-color: red; padding: 0 5px; }
+        .orange-background { background-color: orange; padding: 0 5px; }
+        .yellow-background { background-color: yellow; padding: 0 5px; }
+        .lightgreen-background { background-color: rgb(64, 235, 64); padding: 0 5px; }
+        .lightyellow-background { background-color: rgb(247, 247, 107); padding: 0 5px; }
+
+        .table-container tr:first-child td:first-child { border-top-left-radius: 10px; }
+        .table-container tr:first-child td:last-child { border-top-right-radius: 10px; }
+        .table-container tr:last-child td:first-child { border-bottom-left-radius: 10px; }
+        .table-container tr:last-child td:last-child { border-bottom-right-radius: 10px; }
+
+        @media (max-width: 600px) {
+            .toggle-button {
+                display: block;
+            }
+            .table-container {
+                display: none;
+                width: 90%;
+                left: 5%;
+                top: unset;
+                position: relative;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1><img src="B.png" alt="" class="logo"> Bright's Mechanic Munkaidő Számláló <img src="B.png" alt="" class="logo"></h1>
+    </header>
+    <main>
+        <section class="frame">
+            <div class="side-panel">
+                <h2>Munkaidő Számláló</h2>
+                <div class="input-container">
+                    <label for="start-time">Munkaidő kezdete:</label>
+                    <input type="time" id="start-time" onchange="updateStatus()">
+                    <button class="reset-icon" onclick="clearInput('start-time')">X</button>
+                    <label for="end-time">Munkaidő vége:</label>
+                    <input type="time" id="end-time" onchange="updateStatus()">
+                    <button class="reset-icon" onclick="clearInput('end-time')">X</button>
+                </div>
+                <p id="counter-display" class="counter">Szolgálatban töltött idő: 00:00</p>
+                <button class="reset-button" onclick="resetTime()">Heti idő nullázása</button>
+            </div>
+            <div class="week-days">
+                <div class="day">Hétfő</div>
+                <div class="day">Kedd</div>
+                <div class="day">Szerda</div>
+                <div class="day">Csütörtök</div>
+                <div class="day">Péntek</div>
+                <div class="day">Szombat</div>
+                <div class="day">Vasárnap</div>
+            </div>
+        </section>
+    </main>
+    <button id="toggleTable" class="toggle-button">Munkaidő táblázat</button>
+    <div id="tableContainer" class="table-container">
+        <table>
+            <tbody>
+                <tr><td class="white-background">Próbaidős szerelő</td><td>11 óra</td></tr>
+                <tr><td class="grey-background">Autószerelő</td><td>10 óra</td></tr>
+                <tr><td class="red-background">Tuningszakértő</td><td>9 óra</td></tr>
+                <tr><td class="orange-background">Technikus</td><td>8 óra</td></tr>
+                <tr><td class="yellow-background">Veteránszerelő</td><td>7 óra</td></tr>
+                <tr><td class="lightgreen-background">Mesterszerelő</td><td>6 óra</td></tr>
+                <tr><td class="lightyellow-background">Műszakvezető</td><td>5 óra</td></tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+    <footer>
+        <a href="tuningok2.html" class="tuning-button">Tuningok</a>
+    </footer>
+    <script src="script.js"></script>
+    <script>
+        document.getElementById('toggleTable').addEventListener('click', function() {
+            let tableContainer = document.getElementById('tableContainer');
+            if (tableContainer.style.display === 'none' || tableContainer.style.display === '') {
+                tableContainer.style.display = 'block';
+            } else {
+                tableContainer.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
