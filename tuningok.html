@@ -1,0 +1,147 @@
+
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bright's Mechanic Tuningok</title>
+    <style>
+        body {
+            background-color: #d0f0c0;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        header {
+            background-color: white;
+            color: rgb(141, 10, 10);
+            padding: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            font-size: 24px;
+        }
+        .container {
+            width: 90%;
+            max-width: 600px;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        input[type="text"] {
+            width: 80%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-transform: uppercase; 
+        }
+        button {
+            background-color: black;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: darkgray;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+            text-transform: uppercase; 
+        }
+        .delete-btn {
+            cursor: pointer;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1><img style="height: 25px;" src="B.png" alt=""> Bright's Mechanic Tuningok <img style="height: 25px;" src="B.png" alt=""></h1>
+    </header>
+    <div class="container">
+        <h2>RENDSZÁM MENTÉSE</h2>
+        <input type="text" id="inputField" maxlength="8" placeholder="Írja be a rendszámot">
+        <button onclick="saveData()">Mentés</button>
+        <table>
+            <thead>
+                <tr>
+                    <th>Elmentett Adatok</th>
+                    <th>Törlés</th>
+                </tr>
+            </thead>
+            <tbody id="dataTable"></tbody>
+        </table>
+        <p>Összes tuning: <span id="counterValue">0</span></p>
+        <button onclick="window.location.href='index.html'">Munkaidő</button>
+    </div>
+    <script>
+        let counter = 0;
+        window.onload = function() {
+            loadData();
+        };
+        function loadData() {
+            const savedData = JSON.parse(localStorage.getItem("savedData")) || [];
+            counter = savedData.length;
+            document.getElementById("counterValue").textContent = counter;
+            const table = document.getElementById("dataTable");
+            savedData.forEach(data => {
+                addRow(data, table);
+            });
+        }
+        function saveData() {
+            const inputField = document.getElementById("inputField");
+            const inputValue = inputField.value.trim();
+            if (inputValue && inputValue.length <= 8) {
+                const table = document.getElementById("dataTable");
+                addRow(inputValue, table);
+                let savedData = JSON.parse(localStorage.getItem("savedData")) || [];
+                savedData.push(inputValue);
+                localStorage.setItem("savedData", JSON.stringify(savedData));
+                counter++;
+                document.getElementById("counterValue").textContent = counter;
+                inputField.value = '';
+            } else {
+                alert("Csak 8 karaktert írhat be!");
+            }
+        }
+        function addRow(data, table) {
+            const newRow = table.insertRow();
+            const cell1 = newRow.insertCell(0);
+            const cell2 = newRow.insertCell(1);
+            cell1.textContent = data;
+            const deleteBtn = document.createElement("span");
+            deleteBtn.textContent = "🗑️";
+            deleteBtn.classList.add("delete-btn");
+            deleteBtn.onclick = function() {
+                deleteRow(newRow, data);
+            };
+            cell2.appendChild(deleteBtn);
+        }
+        function deleteRow(row, data) {
+            row.remove();
+            counter--;
+            document.getElementById("counterValue").textContent = counter;
+            let savedData = JSON.parse(localStorage.getItem("savedData")) || [];
+            const index = savedData.indexOf(data);
+            if (index !== -1) {
+                savedData.splice(index, 1);
+                localStorage.setItem("savedData", JSON.stringify(savedData));
+            }
+        }
+    </script>
+</body>
+</html>
