@@ -182,7 +182,16 @@ input[type="time"] {
 }
 
 footer {
-    margin-top: 20px;
+    position: relative;
+    top: 0px;
+    margin-top: 46px;
+    padding: 10px;
+    background-color: #4a7c59;
+    color: white;
+    text-align: center;
+    font-size: 14px;
+    width: 100%;
+
 }
 
 @media (max-width: 600px) {
