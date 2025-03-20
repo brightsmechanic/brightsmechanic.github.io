@@ -48,3 +48,19 @@ function highlightCurrentDay() {
     let todayIndex = new Date().getDay() - 1;
     if (todayIndex >= 0) days[todayIndex].classList.add('current-day');
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteButton = document.getElementById('deleteButton');
+
+    if (deleteButton) {
+        deleteButton.addEventListener('click', function(event) {
+            const confirmed = confirm('Biztosan törölni szeretné a heti munkaidőt?');
+            if (!confirmed) {
+                event.preventDefault(); // Megakadályozza a törlési műveletet
+            } else {
+                // Itt jöhet a tényleges törlési logika, ha szükséges
+                console.log('Heti munkaidő törölve!');
+            }
+        });
+    }
+});
