@@ -18,7 +18,7 @@ function updateStatus() {
         updateCounterDisplay(storedTime);
 
         // Napi bontás frissítése
-        let todayIndex = new Date().getDay(); // 0 (Vasárnap) - 6 (Szombat)
+        let todayIndex = (new Date().getDay() + 6) % 7; // 0 (Vasárnap) - 6 (Szombat)
         let perDayData = JSON.parse(localStorage.getItem('workedMinutesPerDay') || '{}');
 
         perDayData[todayIndex] = (perDayData[todayIndex] || 0) + workedMinutes;
@@ -67,7 +67,7 @@ function clearInput(inputId) {
 
 function highlightCurrentDay() {
     let days = document.querySelectorAll('.day');
-    let todayIndex = new Date().getDay() - 1;
+    let todayIndex = (new Date().getDay() + 6) % 7;
     if (todayIndex === -1) todayIndex = 6;
     if (todayIndex >= 0 && todayIndex < days.length) {
         days[todayIndex].classList.add('current-day');
